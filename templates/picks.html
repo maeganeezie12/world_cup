@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}My Picks{% endblock %}
+{% block content %}
+  <h1>My Picks</h1>
+  <form method="post">
+    {% for row in rows %}
+      {% set match = row.match %}
+      <div class="match-card {{ row.status }}">
+        <div class="match-head">
+          <span class="match-type">{{ row.type_label }}</span>
+          <span class="match-stake">${{ "%.2f"|format(match['stake_amount']) }} stake</span>
+        </div>
+        <div class="match-teams">
+          {% if row.status == 'open' %}
+            <label class="team-choice">
+              <input type="radio" name="match_{{ match['id'] }}" value="{{ match['team_a'] }}"
+                     {{ 'checked' if row.my_pick == match['team_a'] else '' }}>
+              {{ match['team_a'] }}
+            </label>
+            <span class="vs">vs</span>
+            <label class="team-choice">
+              <input type="radio" name="match_{{ match['id'] }}" value="{{ match['team_b'] }}"
+                     {{ 'checked' if row.my_pick == match['team_b'] else '' }}>
+              {{ match['team_b'] }}
+            </label>
+          {% else %}
+            <span>{{ match['team_a'] }} vs {{ match['team_b'] }}</span>
+          {% endif %}
+        </div>
+        <div class="match-meta">
+          {% if match['kickoff_at'] %}
+            <span>Kickoff: {{ match['kickoff_at'] | replace('T', ' ') }}</span>
+          {% else %}
+            <span>Kickoff: TBD</span>
+          {% endif %}
+          {% if row.status == 'open' %}
+            <span class="badge open">Open for picks</span>
+          {% elif row.status == 'locked' %}
+            <span class="badge locked">Locked — awaiting result</span>
+          {% else %}
+            <span class="badge settled">Winner: {{ match['winner'] }}</span>
+          {% endif %}
+          {% if row.my_pick %}
+            <span class="my-pick">Your pick: {{ row.my_pick }}</span>
+          {% elif row.status != 'open' %}
+            <span class="my-pick">You sat this one out</span>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+    <button type="submit">Save picks</button>
+  </form>
+{% endblock %}

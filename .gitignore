@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+bet_league.db
+.venv/

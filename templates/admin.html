@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+  <h1>Admin</h1>
+
+  <h2>Matches</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Round</th>
+          <th>Teams</th>
+          <th>Kickoff</th>
+          <th>Status</th>
+          <th>Picks</th>
+          <th>Pot</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in match_rows %}
+          {% set match = row.match %}
+          <tr>
+            <td>{{ row.type_label }}<br><small>${{ "%.2f"|format(match['stake_amount']) }}</small></td>
+            <td>
+              <form method="post" action="{{ url_for('admin_edit_match', match_id=match['id']) }}" class="inline-form">
+                <input type="text" name="team_a" value="{{ match['team_a'] }}" size="10">
+                vs
+                <input type="text" name="team_b" value="{{ match['team_b'] }}" size="10">
+                <input type="datetime-local" name="kickoff_at"
+                       value="{{ match['kickoff_at'] if match['kickoff_at'] else '' }}">
+                <button type="submit">Save</button>
+              </form>
+            </td>
+            <td>{{ match['kickoff_at'] | replace('T', ' ') if match['kickoff_at'] else 'TBD' }}</td>
+            <td><span class="badge {{ row.status }}">{{ row.status }}</span></td>
+            <td>{{ row.picks_count }}</td>
+            <td>${{ "%.2f"|format(row.pot_total) }}</td>
+            <td>
+              {% if match['winner'] %}
+                Winner: <strong>{{ match['winner'] }}</strong>
+                ({{ row.correct_count }} correct, ${{ "%.2f"|format(row.payout_each) if row.payout_each else '0.00' }} each)
+                <form method="post" action="{{ url_for('admin_clear_result', match_id=match['id']) }}" class="inline-form">
+                  <button type="submit">Clear</button>
+                </form>
+              {% else %}
+                <form method="post" action="{{ url_for('admin_set_result', match_id=match['id']) }}" class="inline-form">
+                  <select name="winner">
+                    <option value="{{ match['team_a'] }}">{{ match['team_a'] }}</option>
+                    <option value="{{ match['team_b'] }}">{{ match['team_b'] }}</option>
+                  </select>
+                  <button type="submit">Set result</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Players</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Joined</th>
+          <th>Bets placed</th>
+          <th>Stake committed</th>
+          <th>Winnings</th>
+          <th>Net</th>
+          <th>Paid</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in player_rows %}
+          <tr>
+            <td>{{ row.player['display_name'] }}</td>
+            <td>{{ row.player['joined_at'] | replace('T', ' ') }}</td>
+            <td>{{ row.bets_placed }} / 8</td>
+            <td>${{ "%.2f"|format(row.stake_committed) }}</td>
+            <td>${{ "%.2f"|format(row.winnings) }}</td>
+            <td class="{{ 'positive' if row.winnings - row.stake_committed > 0 else 'negative' if row.winnings - row.stake_committed < 0 else '' }}">
+              ${{ "%.2f"|format(row.winnings - row.stake_committed) }}
+            </td>
+            <td>
+              <form method="post" action="{{ url_for('admin_toggle_paid', player_id=row.player['id']) }}" class="inline-form">
+                <button type="submit">{{ "✅ Paid" if row.player['paid'] else "❌ Unpaid" }}</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7">No players yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

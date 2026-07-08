@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Scoreboard{% endblock %}
+{% block content %}
+  <h1>Scoreboard</h1>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Winnings</th>
+          <th>Accuracy</th>
+          <th>Bets placed</th>
+          <th>Paid</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr class="{{ 'me' if current_player and row.player['id'] == current_player['id'] else '' }}">
+            <td>{{ loop.index }}</td>
+            <td>{{ row.player['display_name'] }}</td>
+            <td class="{{ 'positive' if row.winnings > 0 else '' }}">${{ "%.2f"|format(row.winnings) }}</td>
+            <td>{{ "%.0f%%"|format(row.accuracy) if row.accuracy is not none else "—" }}</td>
+            <td>{{ row.bets_placed }} / 8</td>
+            <td>{{ "✅" if row.player['paid'] else "❌" }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6">No players yet — be the first to <a href="{{ url_for('join') }}">join</a>.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

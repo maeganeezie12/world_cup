@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Join{% endblock %}
+{% block content %}
+  <h1>Join the pool</h1>
+  <p>New here? Pick a name and a 4-digit PIN to create your spot. Already joined? Enter the same name and PIN to get back in.</p>
+  <form method="post" class="card">
+    <label>Display name
+      <input type="text" name="display_name" maxlength="50" required autofocus>
+    </label>
+    <label>4-digit PIN
+      <input type="password" name="pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required>
+    </label>
+    <button type="submit">Join / Log in</button>
+  </form>
+{% endblock %}
