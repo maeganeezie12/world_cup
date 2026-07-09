@@ -47,6 +47,20 @@
             <span class="my-pick">You sat this one out</span>
           {% endif %}
         </div>
+        <div class="votes">
+          <div class="votes-side">
+            <strong>{{ team_flag(match['team_a']) }} {{ match['team_a'] }}: {{ row.team_a_voters|length }}</strong>
+            {% if row.team_a_voters %}
+              <span class="voters">{{ row.team_a_voters|join(', ') }}</span>
+            {% endif %}
+          </div>
+          <div class="votes-side">
+            <strong>{{ team_flag(match['team_b']) }} {{ match['team_b'] }}: {{ row.team_b_voters|length }}</strong>
+            {% if row.team_b_voters %}
+              <span class="voters">{{ row.team_b_voters|join(', ') }}</span>
+            {% endif %}
+          </div>
+        </div>
       </div>
     {% endfor %}
     <button type="submit">Save picks</button>

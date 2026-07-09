@@ -323,12 +323,26 @@ def picks():
 
     view_rows = []
     for match in matches:
+        voters = db.execute(
+            """
+            SELECT player.display_name AS name, pick.picked_winner AS picked_winner
+            FROM pick JOIN player ON player.id = pick.player_id
+            WHERE pick.match_id = ?
+            ORDER BY player.display_name
+            """,
+            (match["id"],),
+        ).fetchall()
+        team_a_voters = [v["name"] for v in voters if v["picked_winner"] == match["team_a"]]
+        team_b_voters = [v["name"] for v in voters if v["picked_winner"] == match["team_b"]]
+
         view_rows.append(
             {
                 "match": match,
                 "type_label": MATCH_TYPE_LABELS.get(match["type"], match["type"]),
                 "status": match_status(match),
                 "my_pick": my_picks.get(match["id"]),
+                "team_a_voters": team_a_voters,
+                "team_b_voters": team_b_voters,
             }
         )
 
