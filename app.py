@@ -467,6 +467,20 @@ def admin_toggle_paid(player_id):
     return redirect(url_for("admin_dashboard"))
 
 
+@app.route("/admin/players/<int:player_id>/delete", methods=["POST"])
+def admin_delete_player(player_id):
+    if not require_admin():
+        return redirect(url_for("admin_login"))
+    db = get_db()
+    player = db.execute("SELECT * FROM player WHERE id = ?", (player_id,)).fetchone()
+    if player:
+        db.execute("DELETE FROM pick WHERE player_id = ?", (player_id,))
+        db.execute("DELETE FROM player WHERE id = ?", (player_id,))
+        db.commit()
+        flash(f"Removed {player['display_name']} and their picks.")
+    return redirect(url_for("admin_dashboard"))
+
+
 init_db()
 
 if __name__ == "__main__":
