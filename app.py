@@ -38,14 +38,14 @@ def team_flag(team_name):
     return TEAM_FLAGS.get((team_name or "").strip(), "🏳️")
 
 SEED_MATCHES = [
-    ("QF", "France", "Morocco", 0.10, "2026-07-10T04:00", 1),
-    ("QF", "Spain", "Belgium", 0.10, "2026-07-11T03:00", 2),
-    ("QF", "Norway", "England", 0.10, "2026-07-12T05:00", 3),
-    ("QF", "Argentina", "Switzerland", 0.10, "2026-07-12T09:00", 4),
-    ("SF", "TBD", "TBD", 0.20, "2026-07-15T03:00", 5),
-    ("SF", "TBD", "TBD", 0.20, "2026-07-16T03:00", 6),
-    ("THIRD", "TBD", "TBD", 0.20, None, 7),
-    ("FINAL", "TBD", "TBD", 1.00, None, 8),
+    ("QF", "France", "Morocco", "2026-07-10T04:00", 1),
+    ("QF", "Spain", "Belgium", "2026-07-11T03:00", 2),
+    ("QF", "Norway", "England", "2026-07-12T05:00", 3),
+    ("QF", "Argentina", "Switzerland", "2026-07-12T09:00", 4),
+    ("SF", "TBD", "TBD", "2026-07-15T03:00", 5),
+    ("SF", "TBD", "TBD", "2026-07-16T03:00", 6),
+    ("THIRD", "TBD", "TBD", None, 7),
+    ("FINAL", "TBD", "TBD", None, 8),
 ]
 
 
@@ -72,7 +72,6 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             display_name TEXT NOT NULL,
             pin_hash TEXT NOT NULL,
-            paid INTEGER NOT NULL DEFAULT 0,
             joined_at TEXT NOT NULL
         );
 
@@ -81,7 +80,6 @@ def init_db():
             type TEXT NOT NULL,
             team_a TEXT NOT NULL,
             team_b TEXT NOT NULL,
-            entry_amount REAL NOT NULL,
             kickoff_at TEXT,
             winner TEXT,
             sort_order INTEGER NOT NULL
@@ -102,8 +100,8 @@ def init_db():
     count = db.execute("SELECT COUNT(*) FROM match").fetchone()[0]
     if count == 0:
         db.executemany(
-            "INSERT INTO match (type, team_a, team_b, entry_amount, kickoff_at, sort_order) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO match (type, team_a, team_b, kickoff_at, sort_order) "
+            "VALUES (?, ?, ?, ?, ?)",
             SEED_MATCHES,
         )
         db.commit()
@@ -175,8 +173,7 @@ def enter_site():
 def compute_player_stats(db, player_id):
     picks = db.execute(
         """
-        SELECT pick.picked_winner, match.id AS match_id, match.entry_amount,
-               match.winner, match.type
+        SELECT pick.picked_winner, match.winner
         FROM pick JOIN match ON match.id = pick.match_id
         WHERE pick.player_id = ?
         """,
@@ -184,30 +181,15 @@ def compute_player_stats(db, player_id):
     ).fetchall()
 
     picks_made = len(picks)
-    entry_committed = sum(p["entry_amount"] for p in picks)
     settled = [p for p in picks if p["winner"]]
     correct = [p for p in settled if p["picked_winner"] == p["winner"]]
-    accuracy = (len(correct) / len(settled) * 100) if settled else None
-
-    winnings = 0.0
-    for p in settled:
-        pickers = db.execute(
-            "SELECT picked_winner FROM pick WHERE match_id = ?", (p["match_id"],)
-        ).fetchall()
-        pot_total = p["entry_amount"] * len(pickers)
-        correct_count = sum(1 for row in pickers if row["picked_winner"] == p["winner"])
-        if p["picked_winner"] == p["winner"]:
-            if correct_count > 0:
-                winnings += pot_total / correct_count
-        elif correct_count == 0:
-            # nobody picked the actual winner for this match - refund everyone's entry
-            winnings += p["entry_amount"]
+    wins = len(correct)
+    accuracy = (wins / len(settled) * 100) if settled else None
 
     return {
         "picks_made": picks_made,
-        "entry_committed": entry_committed,
+        "wins": wins,
         "accuracy": accuracy,
-        "winnings": winnings,
     }
 
 
@@ -219,7 +201,7 @@ def leaderboard():
     for player in players:
         stats = compute_player_stats(db, player["id"])
         rows.append({"player": player, **stats})
-    rows.sort(key=lambda r: r["winnings"], reverse=True)
+    rows.sort(key=lambda r: (r["wins"], r["accuracy"] or 0), reverse=True)
     return render_template("leaderboard.html", rows=rows)
 
 
@@ -260,7 +242,7 @@ def join():
 
         pin_hash = generate_password_hash(pin)
         cur = db.execute(
-            "INSERT INTO player (display_name, pin_hash, paid, joined_at) VALUES (?, ?, 0, ?)",
+            "INSERT INTO player (display_name, pin_hash, joined_at) VALUES (?, ?, ?)",
             (name, pin_hash, now_iso()),
         )
         db.commit()
@@ -386,7 +368,6 @@ def admin_dashboard():
         pickers = db.execute(
             "SELECT picked_winner FROM pick WHERE match_id = ?", (match["id"],)
         ).fetchall()
-        pot_total = match["entry_amount"] * len(pickers)
         correct_count = sum(1 for p in pickers if p["picked_winner"] == match["winner"]) if match["winner"] else 0
         match_rows.append(
             {
@@ -394,9 +375,7 @@ def admin_dashboard():
                 "type_label": MATCH_TYPE_LABELS.get(match["type"], match["type"]),
                 "status": match_status(match),
                 "picks_count": len(pickers),
-                "pot_total": pot_total,
                 "correct_count": correct_count,
-                "payout_each": (pot_total / correct_count) if correct_count else None,
             }
         )
 
@@ -450,20 +429,6 @@ def admin_clear_result(match_id):
     db.execute("UPDATE match SET winner = NULL WHERE id = ?", (match_id,))
     db.commit()
     flash("Result cleared.")
-    return redirect(url_for("admin_dashboard"))
-
-
-@app.route("/admin/players/<int:player_id>/toggle_paid", methods=["POST"])
-def admin_toggle_paid(player_id):
-    if not require_admin():
-        return redirect(url_for("admin_login"))
-    db = get_db()
-    player = db.execute("SELECT * FROM player WHERE id = ?", (player_id,)).fetchone()
-    if player:
-        db.execute(
-            "UPDATE player SET paid = ? WHERE id = ?", (0 if player["paid"] else 1, player_id)
-        )
-        db.commit()
     return redirect(url_for("admin_dashboard"))
 
 

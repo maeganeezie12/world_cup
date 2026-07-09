@@ -8,10 +8,9 @@
         <tr>
           <th>#</th>
           <th>Player</th>
-          <th>Winnings</th>
+          <th>Wins</th>
           <th>Accuracy</th>
           <th>Picks made</th>
-          <th>Paid</th>
         </tr>
       </thead>
       <tbody>
@@ -19,13 +18,12 @@
           <tr class="{{ 'me' if current_player and row.player['id'] == current_player['id'] else '' }}">
             <td>{{ loop.index }}</td>
             <td>{{ row.player['display_name'] }}</td>
-            <td class="{{ 'positive' if row.winnings > 0 else '' }}">${{ "%.2f"|format(row.winnings) }}</td>
+            <td class="{{ 'positive' if row.wins > 0 else '' }}">{{ row.wins }}</td>
             <td>{{ "%.0f%%"|format(row.accuracy) if row.accuracy is not none else "—" }}</td>
             <td>{{ row.picks_made }} / 8</td>
-            <td>{{ "✅" if row.player['paid'] else "❌" }}</td>
           </tr>
         {% else %}
-          <tr><td colspan="6">No players yet — be the first to <a href="{{ url_for('join') }}">join</a>.</td></tr>
+          <tr><td colspan="5">No players yet — be the first to <a href="{{ url_for('join') }}">join</a>.</td></tr>
         {% endfor %}
       </tbody>
     </table>

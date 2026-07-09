@@ -13,7 +13,6 @@
           <th>Kickoff</th>
           <th>Status</th>
           <th>Picks</th>
-          <th>Pot</th>
           <th>Result</th>
         </tr>
       </thead>
@@ -21,7 +20,7 @@
         {% for row in match_rows %}
           {% set match = row.match %}
           <tr>
-            <td>{{ row.type_label }}<br><small>${{ "%.2f"|format(match['entry_amount']) }}</small></td>
+            <td>{{ row.type_label }}</td>
             <td>
               <form method="post" action="{{ url_for('admin_edit_match', match_id=match['id']) }}" class="inline-form">
                 {{ team_flag(match['team_a']) }}
@@ -37,11 +36,10 @@
             <td>{{ match['kickoff_at'] | replace('T', ' ') if match['kickoff_at'] else 'TBD' }}</td>
             <td><span class="badge {{ row.status }}">{{ row.status }}</span></td>
             <td>{{ row.picks_count }}</td>
-            <td>${{ "%.2f"|format(row.pot_total) }}</td>
             <td>
               {% if match['winner'] %}
                 Winner: <strong>{{ team_flag(match['winner']) }} {{ match['winner'] }}</strong>
-                ({{ row.correct_count }} correct, ${{ "%.2f"|format(row.payout_each) if row.payout_each else '0.00' }} each)
+                ({{ row.correct_count }} correct)
                 <form method="post" action="{{ url_for('admin_clear_result', match_id=match['id']) }}" class="inline-form">
                   <button type="submit">Clear</button>
                 </form>
@@ -69,10 +67,8 @@
           <th>Player</th>
           <th>Joined</th>
           <th>Picks made</th>
-          <th>Entry committed</th>
-          <th>Winnings</th>
-          <th>Net</th>
-          <th>Paid</th>
+          <th>Wins</th>
+          <th>Accuracy</th>
           <th></th>
         </tr>
       </thead>
@@ -82,16 +78,8 @@
             <td>{{ row.player['display_name'] }}</td>
             <td>{{ row.player['joined_at'] | replace('T', ' ') }}</td>
             <td>{{ row.picks_made }} / 8</td>
-            <td>${{ "%.2f"|format(row.entry_committed) }}</td>
-            <td>${{ "%.2f"|format(row.winnings) }}</td>
-            <td class="{{ 'positive' if row.winnings - row.entry_committed > 0 else 'negative' if row.winnings - row.entry_committed < 0 else '' }}">
-              ${{ "%.2f"|format(row.winnings - row.entry_committed) }}
-            </td>
-            <td>
-              <form method="post" action="{{ url_for('admin_toggle_paid', player_id=row.player['id']) }}" class="inline-form">
-                <button type="submit">{{ "✅ Paid" if row.player['paid'] else "❌ Unpaid" }}</button>
-              </form>
-            </td>
+            <td>{{ row.wins }}</td>
+            <td>{{ "%.0f%%"|format(row.accuracy) if row.accuracy is not none else "—" }}</td>
             <td>
               <form method="post" action="{{ url_for('admin_delete_player', player_id=row.player['id']) }}" class="inline-form"
                     onsubmit="return confirm('Remove {{ row.player['display_name'] }} and all their picks? This cannot be undone.');">
@@ -100,7 +88,7 @@
             </td>
           </tr>
         {% else %}
-          <tr><td colspan="8">No players yet.</td></tr>
+          <tr><td colspan="6">No players yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>
