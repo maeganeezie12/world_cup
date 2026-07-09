@@ -11,6 +11,7 @@ DB_PATH = os.path.join(BASE_DIR, "bet_league.db")
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-me")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "changeme")
+SITE_PASSWORD = os.environ.get("SITE_PASSWORD", "0000")
 
 PICK_LOCK_BUFFER = timedelta(hours=1)
 
@@ -149,6 +150,26 @@ def inject_globals():
 
 
 app.jinja_env.globals["team_flag"] = team_flag
+
+
+@app.before_request
+def require_site_password():
+    if request.endpoint in ("enter_site", "static", None):
+        return
+    if not session.get("site_unlocked"):
+        return redirect(url_for("enter_site"))
+
+
+@app.route("/enter", methods=["GET", "POST"])
+def enter_site():
+    if request.method == "POST":
+        password = request.form.get("password", "")
+        if password == SITE_PASSWORD:
+            session["site_unlocked"] = True
+            return redirect(url_for("leaderboard"))
+        flash("Wrong password.")
+        return redirect(url_for("enter_site"))
+    return render_template("enter.html")
 
 
 def compute_player_stats(db, player_id):

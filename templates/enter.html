@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>World Cup Guessing Game</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <h1>🏆 World Cup Guessing Game</h1>
+    <p>This is a private game for invited friends only. Enter the access password to continue.</p>
+    <form method="post" class="card">
+      <label>Access password
+        <input type="password" name="password" required autofocus>
+      </label>
+      <button type="submit">Enter</button>
+    </form>
+  </main>
+</body>
+</html>

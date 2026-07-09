@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}World Cup Bet League{% endblock %}</title>
+  <title>{% block title %}World Cup Guessing Game{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header class="nav">
-    <a class="brand" href="{{ url_for('leaderboard') }}">🏆 World Cup Bet League</a>
+    <a class="brand" href="{{ url_for('leaderboard') }}">🏆 World Cup Guessing Game</a>
     <nav>
       <a href="{{ url_for('leaderboard') }}">Scoreboard</a>
       {% if current_player %}
