@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import Flask, g, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,12 +12,29 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-me")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "changeme")
 
+PICK_LOCK_BUFFER = timedelta(hours=1)
+
 MATCH_TYPE_LABELS = {
     "QF": "Quarterfinal",
     "SF": "Semifinal",
     "THIRD": "Third Place Playoff",
     "FINAL": "Final",
 }
+
+TEAM_FLAGS = {
+    "France": "🇫🇷",
+    "Morocco": "🇲🇦",
+    "Spain": "🇪🇸",
+    "Belgium": "🇧🇪",
+    "Norway": "🇳🇴",
+    "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "Argentina": "🇦🇷",
+    "Switzerland": "🇨🇭",
+}
+
+
+def team_flag(team_name):
+    return TEAM_FLAGS.get((team_name or "").strip(), "🏳️")
 
 SEED_MATCHES = [
     ("QF", "France", "Morocco", 0.10, "2026-07-10T04:00", 1),
@@ -104,7 +121,7 @@ def parse_dt(value):
 
 def match_is_open(match):
     kickoff = parse_dt(match["kickoff_at"])
-    return kickoff is None or datetime.now() < kickoff
+    return kickoff is None or datetime.now() < kickoff - PICK_LOCK_BUFFER
 
 
 def match_status(match):
@@ -129,6 +146,9 @@ def is_admin():
 @app.context_processor
 def inject_globals():
     return {"current_player": get_current_player(), "is_admin": is_admin()}
+
+
+app.jinja_env.globals["team_flag"] = team_flag
 
 
 def compute_player_stats(db, player_id):

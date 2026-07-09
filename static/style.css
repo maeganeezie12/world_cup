@@ -179,6 +179,8 @@ button:hover { opacity: 0.9; }
 
 .my-pick { font-weight: 600; }
 
+.hint { color: var(--muted); font-size: 0.9rem; margin-top: -0.25rem; }
+
 @media (max-width: 480px) {
   .nav { flex-direction: column; align-items: flex-start; }
 }

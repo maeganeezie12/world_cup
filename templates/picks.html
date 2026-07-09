@@ -2,6 +2,7 @@
 {% block title %}My Picks{% endblock %}
 {% block content %}
   <h1>My Picks</h1>
+  <p class="hint">Picks lock 1 hour before that match's kickoff — each match locks independently.</p>
   <form method="post">
     {% for row in rows %}
       {% set match = row.match %}
@@ -15,16 +16,16 @@
             <label class="team-choice">
               <input type="radio" name="match_{{ match['id'] }}" value="{{ match['team_a'] }}"
                      {{ 'checked' if row.my_pick == match['team_a'] else '' }}>
-              {{ match['team_a'] }}
+              {{ team_flag(match['team_a']) }} {{ match['team_a'] }}
             </label>
             <span class="vs">vs</span>
             <label class="team-choice">
               <input type="radio" name="match_{{ match['id'] }}" value="{{ match['team_b'] }}"
                      {{ 'checked' if row.my_pick == match['team_b'] else '' }}>
-              {{ match['team_b'] }}
+              {{ team_flag(match['team_b']) }} {{ match['team_b'] }}
             </label>
           {% else %}
-            <span>{{ match['team_a'] }} vs {{ match['team_b'] }}</span>
+            <span>{{ team_flag(match['team_a']) }} {{ match['team_a'] }} vs {{ team_flag(match['team_b']) }} {{ match['team_b'] }}</span>
           {% endif %}
         </div>
         <div class="match-meta">

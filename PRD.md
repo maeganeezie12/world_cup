@@ -35,7 +35,7 @@ A lightweight, self-hosted website for tracking a friends/family/office World Cu
 - Picks are made **match by match**, not as one upfront full-bracket guess:
   1. Once a match's teams are known, the admin opens picks for it.
   2. Each player picks a winner for that match.
-  3. Picks lock automatically at that match's kickoff time.
+  3. Picks lock automatically **1 hour before** that match's kickoff time — only that match locks, every other still-upcoming match stays open independently.
   4. Admin enters the actual result after full-time; winnings are calculated automatically.
 - If a player doesn't submit a pick before kickoff, they simply **sit out that match** — no stake, no winnings, no loss for that one.
 
@@ -64,7 +64,7 @@ This is the only payout mechanism — no bonuses, multipliers, or point weightin
    - Paid/unpaid status.
    - Updates automatically as the admin enters each match's result.
 2. **Join** — name + PIN, one-time.
-3. **My Picks** — enter/edit picks for any currently open match (locked at kickoff); shows past picks and winnings per match.
+3. **My Picks** — enter/edit picks for any currently open match (locks 1 hour before kickoff, per match); shows past picks and winnings per match. Team names shown with country flag icons.
 4. **Admin Panel** (protected by a shared admin password, separate from player PINs) — create matches, open/close picking, enter results, toggle paid status, publish final payout.
 
 ## 9. Data Model (Flask + SQLite)
@@ -81,7 +81,7 @@ This is the only payout mechanism — no bonuses, multipliers, or point weightin
 
 ## 11. Non-Functional Requirements
 - Mobile-responsive — most players will pick via phone.
-- Match lock times enforced **server-side** (not just hidden UI) — a player can't submit a pick after kickoff even by hitting the API directly.
+- Match lock times enforced **server-side** (not just hidden UI) — a player can't submit a pick within 1 hour of kickoff even by hitting the API directly.
 - All times displayed in a single agreed timezone (configurable, default to admin's local timezone) to avoid "I thought kickoff was later" disputes.
 - No real payment data handled — reduces liability/compliance surface significantly.
 

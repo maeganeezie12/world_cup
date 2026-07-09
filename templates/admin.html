@@ -24,8 +24,10 @@
             <td>{{ row.type_label }}<br><small>${{ "%.2f"|format(match['stake_amount']) }}</small></td>
             <td>
               <form method="post" action="{{ url_for('admin_edit_match', match_id=match['id']) }}" class="inline-form">
+                {{ team_flag(match['team_a']) }}
                 <input type="text" name="team_a" value="{{ match['team_a'] }}" size="10">
                 vs
+                {{ team_flag(match['team_b']) }}
                 <input type="text" name="team_b" value="{{ match['team_b'] }}" size="10">
                 <input type="datetime-local" name="kickoff_at"
                        value="{{ match['kickoff_at'] if match['kickoff_at'] else '' }}">
@@ -38,7 +40,7 @@
             <td>${{ "%.2f"|format(row.pot_total) }}</td>
             <td>
               {% if match['winner'] %}
-                Winner: <strong>{{ match['winner'] }}</strong>
+                Winner: <strong>{{ team_flag(match['winner']) }} {{ match['winner'] }}</strong>
                 ({{ row.correct_count }} correct, ${{ "%.2f"|format(row.payout_each) if row.payout_each else '0.00' }} each)
                 <form method="post" action="{{ url_for('admin_clear_result', match_id=match['id']) }}" class="inline-form">
                   <button type="submit">Clear</button>
@@ -46,8 +48,8 @@
               {% else %}
                 <form method="post" action="{{ url_for('admin_set_result', match_id=match['id']) }}" class="inline-form">
                   <select name="winner">
-                    <option value="{{ match['team_a'] }}">{{ match['team_a'] }}</option>
-                    <option value="{{ match['team_b'] }}">{{ match['team_b'] }}</option>
+                    <option value="{{ match['team_a'] }}">{{ team_flag(match['team_a']) }} {{ match['team_a'] }}</option>
+                    <option value="{{ match['team_b'] }}">{{ team_flag(match['team_b']) }} {{ match['team_b'] }}</option>
                   </select>
                   <button type="submit">Set result</button>
                 </form>
