@@ -6,7 +6,7 @@ from flask import Flask, g, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "bet_league.db")
+DB_PATH = os.path.join(BASE_DIR, "pick_league.db")
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-me")
@@ -81,7 +81,7 @@ def init_db():
             type TEXT NOT NULL,
             team_a TEXT NOT NULL,
             team_b TEXT NOT NULL,
-            stake_amount REAL NOT NULL,
+            entry_amount REAL NOT NULL,
             kickoff_at TEXT,
             winner TEXT,
             sort_order INTEGER NOT NULL
@@ -102,7 +102,7 @@ def init_db():
     count = db.execute("SELECT COUNT(*) FROM match").fetchone()[0]
     if count == 0:
         db.executemany(
-            "INSERT INTO match (type, team_a, team_b, stake_amount, kickoff_at, sort_order) "
+            "INSERT INTO match (type, team_a, team_b, entry_amount, kickoff_at, sort_order) "
             "VALUES (?, ?, ?, ?, ?, ?)",
             SEED_MATCHES,
         )
@@ -175,7 +175,7 @@ def enter_site():
 def compute_player_stats(db, player_id):
     picks = db.execute(
         """
-        SELECT pick.picked_winner, match.id AS match_id, match.stake_amount,
+        SELECT pick.picked_winner, match.id AS match_id, match.entry_amount,
                match.winner, match.type
         FROM pick JOIN match ON match.id = pick.match_id
         WHERE pick.player_id = ?
@@ -183,8 +183,8 @@ def compute_player_stats(db, player_id):
         (player_id,),
     ).fetchall()
 
-    bets_placed = len(picks)
-    stake_committed = sum(p["stake_amount"] for p in picks)
+    picks_made = len(picks)
+    entry_committed = sum(p["entry_amount"] for p in picks)
     settled = [p for p in picks if p["winner"]]
     correct = [p for p in settled if p["picked_winner"] == p["winner"]]
     accuracy = (len(correct) / len(settled) * 100) if settled else None
@@ -194,18 +194,18 @@ def compute_player_stats(db, player_id):
         pickers = db.execute(
             "SELECT picked_winner FROM pick WHERE match_id = ?", (p["match_id"],)
         ).fetchall()
-        pot_total = p["stake_amount"] * len(pickers)
+        pot_total = p["entry_amount"] * len(pickers)
         correct_count = sum(1 for row in pickers if row["picked_winner"] == p["winner"])
         if p["picked_winner"] == p["winner"]:
             if correct_count > 0:
                 winnings += pot_total / correct_count
         elif correct_count == 0:
-            # nobody picked the actual winner for this match - refund everyone's stake
-            winnings += p["stake_amount"]
+            # nobody picked the actual winner for this match - refund everyone's entry
+            winnings += p["entry_amount"]
 
     return {
-        "bets_placed": bets_placed,
-        "stake_committed": stake_committed,
+        "picks_made": picks_made,
+        "entry_committed": entry_committed,
         "accuracy": accuracy,
         "winnings": winnings,
     }
@@ -386,7 +386,7 @@ def admin_dashboard():
         pickers = db.execute(
             "SELECT picked_winner FROM pick WHERE match_id = ?", (match["id"],)
         ).fetchall()
-        pot_total = match["stake_amount"] * len(pickers)
+        pot_total = match["entry_amount"] * len(pickers)
         correct_count = sum(1 for p in pickers if p["picked_winner"] == match["winner"]) if match["winner"] else 0
         match_rows.append(
             {
@@ -470,4 +470,4 @@ def admin_toggle_paid(player_id):
 init_db()
 
 if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    app.run(debug=True, host="127.0.0.1", port=8000)

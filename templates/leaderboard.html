@@ -10,7 +10,7 @@
           <th>Player</th>
           <th>Winnings</th>
           <th>Accuracy</th>
-          <th>Bets placed</th>
+          <th>Picks made</th>
           <th>Paid</th>
         </tr>
       </thead>
@@ -21,7 +21,7 @@
             <td>{{ row.player['display_name'] }}</td>
             <td class="{{ 'positive' if row.winnings > 0 else '' }}">${{ "%.2f"|format(row.winnings) }}</td>
             <td>{{ "%.0f%%"|format(row.accuracy) if row.accuracy is not none else "—" }}</td>
-            <td>{{ row.bets_placed }} / 8</td>
+            <td>{{ row.picks_made }} / 8</td>
             <td>{{ "✅" if row.player['paid'] else "❌" }}</td>
           </tr>
         {% else %}

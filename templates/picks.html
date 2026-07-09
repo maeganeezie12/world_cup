@@ -9,7 +9,7 @@
       <div class="match-card {{ row.status }}">
         <div class="match-head">
           <span class="match-type">{{ row.type_label }}</span>
-          <span class="match-stake">${{ "%.2f"|format(match['stake_amount']) }} stake</span>
+          <span class="match-entry">${{ "%.2f"|format(match['entry_amount']) }} entry</span>
         </div>
         <div class="match-teams">
           {% if row.status == 'open' %}

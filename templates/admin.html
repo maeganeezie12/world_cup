@@ -21,7 +21,7 @@
         {% for row in match_rows %}
           {% set match = row.match %}
           <tr>
-            <td>{{ row.type_label }}<br><small>${{ "%.2f"|format(match['stake_amount']) }}</small></td>
+            <td>{{ row.type_label }}<br><small>${{ "%.2f"|format(match['entry_amount']) }}</small></td>
             <td>
               <form method="post" action="{{ url_for('admin_edit_match', match_id=match['id']) }}" class="inline-form">
                 {{ team_flag(match['team_a']) }}
@@ -68,8 +68,8 @@
         <tr>
           <th>Player</th>
           <th>Joined</th>
-          <th>Bets placed</th>
-          <th>Stake committed</th>
+          <th>Picks made</th>
+          <th>Entry committed</th>
           <th>Winnings</th>
           <th>Net</th>
           <th>Paid</th>
@@ -80,11 +80,11 @@
           <tr>
             <td>{{ row.player['display_name'] }}</td>
             <td>{{ row.player['joined_at'] | replace('T', ' ') }}</td>
-            <td>{{ row.bets_placed }} / 8</td>
-            <td>${{ "%.2f"|format(row.stake_committed) }}</td>
+            <td>{{ row.picks_made }} / 8</td>
+            <td>${{ "%.2f"|format(row.entry_committed) }}</td>
             <td>${{ "%.2f"|format(row.winnings) }}</td>
-            <td class="{{ 'positive' if row.winnings - row.stake_committed > 0 else 'negative' if row.winnings - row.stake_committed < 0 else '' }}">
-              ${{ "%.2f"|format(row.winnings - row.stake_committed) }}
+            <td class="{{ 'positive' if row.winnings - row.entry_committed > 0 else 'negative' if row.winnings - row.entry_committed < 0 else '' }}">
+              ${{ "%.2f"|format(row.winnings - row.entry_committed) }}
             </td>
             <td>
               <form method="post" action="{{ url_for('admin_toggle_paid', player_id=row.player['id']) }}" class="inline-form">
