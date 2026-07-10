@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>World Cup Guessing Game</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <main class="container">
+  <main class="container" style="max-width: 480px; padding-top: 3rem;">
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <ul class="flashes">
@@ -18,8 +19,10 @@
       {% endif %}
     {% endwith %}
 
-    <h1>🏆 World Cup Guessing Game</h1>
-    <p>This is a private prediction game and scorekeeping tool for a small group of friends — it doesn't process, hold, or move any money. Enter the access password to continue.</p>
+    <div class="pitch-banner">
+      <h1>⚽ World Cup Guessing Game</h1>
+      <p>This is a private prediction game and scorekeeping tool for a small group of friends — it doesn't process, hold, or move any money.</p>
+    </div>
     <form method="post" class="card">
       <label>Access password
         <input type="password" name="password" required autofocus>

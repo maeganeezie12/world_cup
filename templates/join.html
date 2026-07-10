@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Join{% endblock %}
 {% block content %}
-  <h1>Join the pool</h1>
-  <p>New here? Pick a name and a 4-digit PIN to create your spot. Already joined? Enter the same name and PIN to get back in.</p>
+  <div class="pitch-banner">
+    <h1>⚽ Join the Game</h1>
+    <p>New here? Pick a name and a 4-digit PIN to create your spot. Already joined? Enter the same name and PIN to get back in.</p>
+  </div>
   <form method="post" class="card">
     <label>Display name
       <input type="text" name="display_name" maxlength="50" required autofocus>

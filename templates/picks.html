@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% block title %}My Picks{% endblock %}
 {% block content %}
-  <h1>My Picks</h1>
-  <p class="hint">Picks lock 1 hour before that match's kickoff — each match locks independently.</p>
+  <div class="pitch-banner">
+    <h1>⚽ My Picks</h1>
+    <p>Picks lock 1 hour before that match's kickoff — each match locks independently.</p>
+  </div>
   <form method="post">
     {% for row in rows %}
       {% set match = row.match %}
