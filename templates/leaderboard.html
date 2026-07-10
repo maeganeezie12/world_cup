@@ -20,7 +20,7 @@
             <td>{{ row.player['display_name'] }}</td>
             <td class="{{ 'positive' if row.wins > 0 else '' }}">{{ row.wins }}</td>
             <td>{{ "%.0f%%"|format(row.accuracy) if row.accuracy is not none else "—" }}</td>
-            <td>{{ row.picks_made }} / 8</td>
+            <td>{{ row.picks_made }} / {{ row.eligible_matches }}</td>
           </tr>
         {% else %}
           <tr><td colspan="5">No players yet — be the first to <a href="{{ url_for('join') }}">join</a>.</td></tr>

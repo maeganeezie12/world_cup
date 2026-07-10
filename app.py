@@ -171,6 +171,8 @@ def enter_site():
 
 
 def compute_player_stats(db, player_id):
+    player = db.execute("SELECT joined_at FROM player WHERE id = ?", (player_id,)).fetchone()
+
     picks = db.execute(
         """
         SELECT pick.picked_winner, match.winner
@@ -180,6 +182,11 @@ def compute_player_stats(db, player_id):
         (player_id,),
     ).fetchall()
 
+    eligible_matches = db.execute(
+        "SELECT COUNT(*) FROM match WHERE kickoff_at IS NULL OR kickoff_at > ?",
+        (player["joined_at"],),
+    ).fetchone()[0]
+
     picks_made = len(picks)
     settled = [p for p in picks if p["winner"]]
     correct = [p for p in settled if p["picked_winner"] == p["winner"]]
@@ -188,6 +195,7 @@ def compute_player_stats(db, player_id):
 
     return {
         "picks_made": picks_made,
+        "eligible_matches": eligible_matches,
         "wins": wins,
         "accuracy": accuracy,
     }

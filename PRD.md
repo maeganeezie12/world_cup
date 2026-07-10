@@ -78,9 +78,16 @@ A lightweight, self-hosted website for tracking a friends/family/office World Cu
 ## 13. Match Schedule
 All times as shown on the official schedule (source timezone as displayed — confirm/convert to your local timezone before setting kickoff lock times per §11).
 
+**Completed:**
+
+| Match | Round | Result |
+|---|---|---|
+| France vs Morocco | Quarterfinal | 🇫🇷 France won |
+
+**Upcoming:**
+
 | Match | Round | Kickoff |
 |---|---|---|
-| France vs Morocco | Quarterfinal | Fri, 10 Jul, 4:00 AM |
 | Spain vs Belgium | Quarterfinal | Sat, 11 Jul, 3:00 AM |
 | Norway vs England | Quarterfinal | Sun, 12 Jul, 5:00 AM |
 | Argentina vs Switzerland | Quarterfinal | Sun, 12 Jul, 9:00 AM |
