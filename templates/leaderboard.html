@@ -3,7 +3,6 @@
 {% block content %}
   <div class="pitch-banner">
     <h1>⚽ Scoreboard</h1>
-    <p>Ranked by wins, then accuracy.</p>
   </div>
   <div class="table-scroll">
     <table>
@@ -19,8 +18,8 @@
       <tbody>
         {% for row in rows %}
           <tr class="{{ 'me' if current_player and row.player['id'] == current_player['id'] else '' }}">
-            <td class="{{ 'rank-1' if loop.index == 1 else 'rank-2' if loop.index == 2 else 'rank-3' if loop.index == 3 else '' }}">
-              {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
+            <td class="{{ 'rank-1' if row.rank == 1 else 'rank-2' if row.rank == 2 else 'rank-3' if row.rank == 3 else '' }}">
+              {% if row.rank == 1 %}🥇{% elif row.rank == 2 %}🥈{% elif row.rank == 3 %}🥉{% else %}{{ row.rank }}{% endif %}
             </td>
             <td>{{ row.player['display_name'] }}</td>
             <td class="{{ 'positive' if row.wins > 0 else '' }}">{{ row.wins }}</td>

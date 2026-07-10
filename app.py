@@ -210,6 +210,15 @@ def leaderboard():
         stats = compute_player_stats(db, player["id"])
         rows.append({"player": player, **stats})
     rows.sort(key=lambda r: (r["wins"], r["accuracy"] or 0), reverse=True)
+
+    rank = 0
+    prev_wins = None
+    for row in rows:
+        if row["wins"] != prev_wins:
+            rank += 1
+            prev_wins = row["wins"]
+        row["rank"] = rank
+
     return render_template("leaderboard.html", rows=rows)
 
 
