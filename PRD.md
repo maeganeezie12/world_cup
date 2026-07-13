@@ -83,16 +83,16 @@ All times as shown on the official schedule (source timezone as displayed — co
 | Match | Round | Result |
 |---|---|---|
 | France vs Morocco | Quarterfinal | 🇫🇷 France won |
+| Spain vs Belgium | Quarterfinal | 🇪🇸 Spain won |
+| Norway vs England | Quarterfinal | 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England won |
+| Argentina vs Switzerland | Quarterfinal | 🇦🇷 Argentina won |
 
 **Upcoming:**
 
 | Match | Round | Kickoff |
 |---|---|---|
-| Spain vs Belgium | Quarterfinal | Sat, 11 Jul, 3:00 AM |
-| Norway vs England | Quarterfinal | Sun, 12 Jul, 5:00 AM |
-| Argentina vs Switzerland | Quarterfinal | Sun, 12 Jul, 9:00 AM |
-| TBD vs TBD | Semifinal | Wed, 15 Jul, 3:00 AM |
-| TBD vs TBD | Semifinal | Thu, 16 Jul, 3:00 AM |
+| France vs Spain | Semifinal | Wed, 15 Jul, 3:00 AM |
+| England vs Argentina | Semifinal | Thu, 16 Jul, 3:00 AM |
 | TBD vs TBD | Third Place Playoff | Not yet listed |
 | TBD vs TBD | Final | Not yet listed |
 
